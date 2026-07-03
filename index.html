@@ -1,3 +1,7 @@
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
 
 
@@ -50,7 +54,7 @@
       object.traverse(child => {
         if (child.isMesh) {
           child.material = new THREE.MeshStandardMaterial({
-            color: 0x00458F,
+            color: 0x004fff,
             transparent: true,
             opacity: 0.01,
             side: THREE.DoubleSide,
@@ -61,7 +65,7 @@
           const line = new THREE.LineSegments(
             edges,
             new THREE.LineBasicMaterial({
-              color: 0x00458F,
+              color: 0x004fff,
               linewidth: 1,
               depthTest: false,
               transparent: true,
