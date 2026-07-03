@@ -54,12 +54,13 @@
       object.traverse(child => {
         if (child.isMesh) {
           child.material = new THREE.MeshStandardMaterial({
-            color: new THREE.Color("rgb(255,255,255)"),
-            transparent: true,
-            opacity: 0.3,
-            side: THREE.DoubleSide,
-            depthWrite: false
-          });
+  color: 0xffffff,          // 완전한 흰색 (16진수 표현)
+  roughness: 0.5,           // (선택) 반사광 조절: 0에 가까울수록 매끄럽고 1에 가까울수록 둔탁함
+  metalness: 0.0,           // (선택) 금속성 조절
+  side: THREE.DoubleSide,   // 면의 앞/뒷면 모두 렌더링
+  transparent: false,       // 투명도 비활성화 (완전 불투명)
+  depthWrite: true          // 앞뒤 물체 가림 현상 정상화
+});
 
           const edges = new THREE.EdgesGeometry(child.geometry, 1);
           const line = new THREE.LineSegments(
