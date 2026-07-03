@@ -1,0 +1,118 @@
+<div id="threejs"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById("threejs").appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  renderer.setClearColor(new THREE.Color(0, 0, 0), 0);
+
+  const isMobile = window.innerWidth <=768;
+  const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
+  // 모바일일 때 z를 200, 아니면 90
+  camera.position.set(0, 0, isMobile ? 600 : 400);
+  camera.lookAt(0, 0, 0);
+
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambientLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+  directionalLight.position.set(5, 10, 7.5);
+  scene.add(directionalLight);
+
+  const loader = new OBJLoader();
+  loader.load(
+    'https://raw.githubusercontent.com/cionkore/1/refs/heads/main/module-1.obj',
+    function (object) {
+      object.scale.set(0.03, 0.03, 0.03);
+
+      const box = new THREE.Box3().setFromObject(object);
+      const center = box.getCenter(new THREE.Vector3());
+      object.position.sub(center);
+
+      object.traverse(child => {
+        if (child.isMesh) {
+          child.material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0.078, 0, 1),
+            transparent: true,
+            opacity: 0.3,
+            side: THREE.DoubleSide,
+            depthWrite: false
+          });
+
+          const edges = new THREE.EdgesGeometry(child.geometry, 1);
+          const line = new THREE.LineSegments(
+            edges,
+            new THREE.LineBasicMaterial({
+              color: '#1400ff',
+              linewidth: 1,
+              depthTest: false,
+              transparent: true,
+              opacity: 0.7
+            })
+          );
+          child.add(line);
+        }
+      });
+
+      const pivot = new THREE.Group();
+      pivot.add(object);
+      scene.add(pivot);
+      scene.userData.pivot = pivot;
+    }
+  );
+
+  let mouseX = 0, mouseY = 0;
+  let isHovering = false;
+
+  const canvasContainer = document.getElementById('threejs');
+
+//  canvasContainer.addEventListener('mouseenter', () => { isHovering = true; });
+//  canvasContainer.addEventListener('mouseleave', () => { isHovering = false; });
+
+//  canvasContainer.addEventListener('mousemove', (event) => {
+  //  const rect = canvasContainer.getBoundingClientRect();
+  //  mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  //  mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+//  });
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const isMobile = window.innerWidth <= 768;
+    camera.position.z = isMobile ? 600 : 400;
+  });
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    const pivot = scene.userData.pivot;
+    if (pivot) {
+      pivot.rotation.y += 0.0025;
+
+    //  if (isHovering) {
+      //  pivot.rotation.y += mouseX * 0.003;
+      //  pivot.rotation.x = Math.sin(Date.now() * 0.0001) * 0.1 + mouseY * 0.07;
+    //  }
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+</script>
