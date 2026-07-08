@@ -22,7 +22,8 @@
   import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-document.getElementById("threejs").appendChild(renderer.domElement);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById("threejs").appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
   renderer.setClearColor(new THREE.Color(0, 0, 0), 0);
@@ -96,19 +97,14 @@ document.getElementById("threejs").appendChild(renderer.domElement);
   //  mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 //  });
 
-const container = document.getElementById("threejs");
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
-function resize() {
-const width = container.clientWidth;
-const height = container.clientHeight;
-
-camera.aspect = width / height;
-camera.updateProjectionMatrix();
-renderer.setSize(width, height, false);
-
-const isMobile = width <= 768;
-camera.position.z = isMobile ? 600 : 400;
-}
+    const isMobile = window.innerWidth <= 768;
+    camera.position.z = isMobile ? 600 : 400;
+  });
 
   function animate() {
     requestAnimationFrame(animate);
